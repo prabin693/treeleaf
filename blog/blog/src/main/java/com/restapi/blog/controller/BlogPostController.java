@@ -15,6 +15,8 @@ import java.io.IOException;
 public class BlogPostController {
     private final BlogPostService blogPostService;
 
+
+
     //endpoint for creating a blog post
     @PostMapping("/user/blogpost")
     public ResponseEntity<?> createBlogPost(@RequestBody BlogPost blogPost) {
@@ -23,8 +25,8 @@ public class BlogPostController {
 
     //add image
     @PostMapping("/user/blogpost/image/{blogPostId}")
-    public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file, @PathVariable("blogPostId") Long blogPostId) throws IOException {
-        return blogPostService.addImage(file, blogPostId);
+    public ResponseEntity<?> addImage(@RequestParam("image") MultipartFile image, @PathVariable("blogPostId") Long blogPostId) throws IOException {
+        return blogPostService.addImage(image, blogPostId);
     }
 
     //get image

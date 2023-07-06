@@ -7,6 +7,7 @@ import com.restapi.blog.repository.CommentRepository;
 import com.restapi.blog.repository.UserRepository;
 import io.jsonwebtoken.Header;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
@@ -86,18 +87,25 @@ public class BlogPostService {
         return ResponseEntity.ok(blogPost.get());
     }
 
-    public ResponseEntity<?> addImage(MultipartFile file, Long blogPostId) throws IOException {
-        Optional<BlogPost> blogPost = blogPostRepository.findById(blogPostId);
-        if (blogPost.isEmpty()) {
-            ResponseEntity.badRequest().body("Blog post not found");
-        }
-        System.out.println("File name: " + file.getOriginalFilename());
-        BlogPost updatedBlogPost = blogPost.get();
-        updatedBlogPost.setImage(file.getBytes());
-        blogPostRepository.save(updatedBlogPost);
-        return ResponseEntity.ok("Image added successfully");
+    public ResponseEntity<?> addImage(MultipartFile file, Long blogPostId) {
+        try {
+            Optional<BlogPost> blogPost = blogPostRepository.findById(blogPostId);
+            if (blogPost.isEmpty()) {
+                return ResponseEntity.badRequest().body("Blog post not found");
+            }
 
+            BlogPost updatedBlogPost = blogPost.get();
+            byte[] bytes = file.getBytes();
+            blogPost.get().setImage(bytes);
+            blogPostRepository.save(updatedBlogPost);
+
+            return ResponseEntity.ok("Image added successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read image data");
+        }
     }
+
+
 
     public ResponseEntity<?> getImage(Long blogPostId) {
         Optional<BlogPost> blogPost = blogPostRepository.findById(blogPostId);
